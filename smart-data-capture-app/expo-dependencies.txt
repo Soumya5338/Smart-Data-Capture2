@@ -1,0 +1,46 @@
+# --- CORE EXPO + REACT NATIVE ---
+expo
+react
+react-dom
+react-native
+react-native-web
+expo-status-bar
+
+# --- NAVIGATION ---
+@react-navigation/native
+@react-navigation/drawer
+react-native-screens
+react-native-safe-area-context
+react-native-gesture-handler
+react-native-reanimated
+
+# --- UI ICONS ---
+react-native-vector-icons
+@expo/vector-icons
+
+# --- CAMERA & GALLERY ---
+expo-camera
+expo-media-library
+expo-image-picker
+
+# --- FILE SYSTEM & SHARING ---
+expo-file-system
+expo-sharing
+
+# --- VOICE INPUT ---
+expo-speech
+expo-av
+
+# --- OCR & NETWORKING ---
+axios
+expo-constants
+react-native-webview  # If you plan to display OCR results via web
+
+# --- TYPESCRIPT SUPPORT (optional) ---
+typescript
+@types/react
+@types/react-native
+
+npx expo install expo-camera expo-image-picker
+npm install react-native-upi-pay
+
