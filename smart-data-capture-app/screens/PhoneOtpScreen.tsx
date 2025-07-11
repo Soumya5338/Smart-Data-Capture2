@@ -2,89 +2,43 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Text, Alert, StyleSheet } from 'react-native';
 import axios from 'axios';
 
-const APP_ENDPOINT = 'https://abcd-efgh.authgear.cloud'; // 🔁 Replace this
+const SERVER_URL = 'http://192.168.145.55:3000';
 
-export default function PhoneOtpScreen({ navigation }: any) {
+export default function PhoneOtpScreen({ navigation, setAuth }: any) {
   const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
-  const [sent, setSent] = useState(false);
-  const [sessionId, setSessionId] = useState('');
 
   const sendOtp = async () => {
     try {
-      const res = await axios.post(`${APP_ENDPOINT}/oauth2/api/v1/authenticate`, {
-        client_id: 'c10701ea07359b1b', // from Portal
-        x_channel: 'sms',
-        login_id: phone,
-        flow: 'login',
-      });
-
-      setSessionId(res.data.session_id);
-      setSent(true);
-      Alert.alert('OTP sent!', 'Please check your SMS.');
+      const res = await axios.post(`${SERVER_URL}/send-otp`, { phone });
+      Alert.alert('OTP Sent', 'Check SMS or console.');
+      navigation.navigate('OtpVerification', { phone, setAuth }); // 👈 Pass phone + setAuth
     } catch (err) {
       console.error(err);
-      Alert.alert('Failed to send OTP');
-    }
-  };
-
-  const verifyOtp = async () => {
-    try {
-      const res = await axios.post(`${APP_ENDPOINT}/oauth2/api/v1/verify`, {
-        session_id: sessionId,
-        code,
-      });
-
-      const token = res.data.access_token;
-      console.log('✅ Logged in! Token:', token);
-      Alert.alert('Success', 'You are logged in!');
-      navigation.navigate('Home');
-    } catch (err) {
-      console.error(err);
-      Alert.alert('Invalid OTP or session');
+      Alert.alert('Error', 'Failed to send OTP');
     }
   };
 
   return (
     <View style={styles.container}>
-      {!sent ? (
-        <>
-          <Text>Enter Phone Number:</Text>
-          <TextInput
-            placeholder="+91xxxxxxxxxx"
-            value={phone}
-            onChangeText={setPhone}
-            style={styles.input}
-          />
-          <Button title="Send OTP" onPress={sendOtp} />
-        </>
-      ) : (
-        <>
-          <Text>Enter OTP:</Text>
-          <TextInput
-            placeholder="Enter OTP"
-            value={code}
-            onChangeText={setCode}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-          <Button title="Verify OTP" onPress={verifyOtp} />
-        </>
-      )}
+      <Text>Enter Phone Number:</Text>
+      <TextInput
+        placeholder="+91XXXXXXXXXX"
+        value={phone}
+        onChangeText={setPhone}
+        style={styles.input}
+        keyboardType="phone-pad"
+      />
+      <Button title="Send OTP" onPress={sendOtp} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    gap: 15,
-  },
+  container: { flex: 1, padding: 20, justifyContent: 'center' },
   input: {
     borderWidth: 1,
     padding: 10,
     marginBottom: 10,
+    borderRadius: 8,
   },
 });

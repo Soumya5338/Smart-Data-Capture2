@@ -7,10 +7,13 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const otpMap = new Map(); // Stores OTPs: key = email or phone
-const users = new Map();  // Stores users: key = username
+const otpMap = new Map(); // key = email or phone
+const users = new Map();  // key = username
 
-// Email OTP sender setup
+// Dummy user for testing reset password (REMOVE IN PRODUCTION)
+users.set('vinaymantha', { password: 'oldpassword', email: 'vinaymantha4@gmail.com' });
+
+// === Email Transporter ===
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -19,7 +22,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// === Send OTP ===
+// === Send OTP (Email or Phone) ===
 app.post('/send-otp', (req, res) => {
   const { email, phone } = req.body;
   const identifier = email || phone;
@@ -37,14 +40,13 @@ app.post('/send-otp', (req, res) => {
     };
 
     transporter.sendMail(mailOptions, (err) => {
-      if (err) return res.status(500).send({ message: 'Email failed to send' });
+      if (err) return res.status(500).send({ message: 'Failed to send email' });
       console.log(`📧 OTP ${otp} sent to ${email}`);
       res.send({ message: 'OTP sent to email' });
     });
   } else {
-    // Simulate SMS sending
-    console.log(`📲 OTP ${otp} sent to ${phone}`);
-    res.send({ message: 'OTP sent to phone (check console)' });
+    console.log(`📲 OTP ${otp} sent to phone ${phone}`);
+    res.send({ message: 'OTP sent to phone (check console)', otp }); // For dev only
   }
 });
 
@@ -52,7 +54,6 @@ app.post('/send-otp', (req, res) => {
 app.post('/verify-otp', (req, res) => {
   const { email, phone, otp } = req.body;
   const identifier = email || phone;
-
   if (!identifier || !otp) {
     return res.status(400).json({ verified: false, message: 'Missing email/phone or OTP' });
   }
@@ -67,6 +68,23 @@ app.post('/verify-otp', (req, res) => {
   }
 });
 
+// === Reset Password ===
+app.post('/reset-password', (req, res) => {
+  const { email, password } = req.body;
+  console.log('🔁 Reset request:', req.body);
+
+  const userEntry = Array.from(users.entries()).find(([_, user]) => user.email === email);
+  if (!userEntry) {
+    console.log('❌ No user found for this email');
+    return res.status(404).json({ success: false, message: 'User not found' });
+  }
+
+  const [username, userData] = userEntry;
+  users.set(username, { ...userData, password });
+  console.log(`✅ Password updated for ${username}`);
+  res.json({ success: true });
+});
+
 // === Register ===
 app.post('/register', (req, res) => {
   const { username, password, email } = req.body;
@@ -75,7 +93,7 @@ app.post('/register', (req, res) => {
   }
 
   if (users.has(username)) {
-    return res.json({ success: false, message: 'Username already exists' });
+    return res.json({ success: false, message: 'Username exists' });
   }
 
   users.set(username, { password, email });
@@ -87,17 +105,16 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   const user = users.get(username);
-
   if (user && user.password === password) {
     return res.json({ success: true });
   }
   res.json({ success: false, message: 'Invalid credentials' });
 });
 
-// === Test Endpoint ===
 app.get('/', (req, res) => {
   res.send('🚀 Smart Capture OTP Server is running!');
 });
 
-// === Start Server ===
-app.listen(3000, () => console.log('✅ Server running on http://localhost:3000'));
+app.listen(3000, () =>
+  console.log('✅ Server running on http://localhost:3000')
+);

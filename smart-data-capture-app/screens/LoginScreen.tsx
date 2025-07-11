@@ -7,6 +7,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 
 export default function LoginScreen({ navigation, setAuth }: any) {
@@ -14,11 +15,11 @@ export default function LoginScreen({ navigation, setAuth }: any) {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // Dummy login: Replace this with real API call
+    // Dummy login: Replace with API call if needed
     if (username && password) {
-      setAuth(true); // triggers Drawer navigation
+      setAuth(true); // Simulate successful login
     } else {
-      alert("Please enter username and password");
+      Alert.alert("Error", "Please enter username and password");
     }
   };
 
@@ -55,11 +56,16 @@ export default function LoginScreen({ navigation, setAuth }: any) {
         style={styles.signupLink}
       >
         <Text style={styles.signupText}>
-          Don't have an account? <Text style={{ fontWeight: 'bold' }}>Sign up</Text>
+          Don't have an account?{' '}
+          <Text style={{ fontWeight: 'bold' }}>Sign up</Text>
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.forgotLink}>
+      {/* ✅ Forgot password logic */}
+      <TouchableOpacity
+        onPress={() => navigation.navigate('ForgotPassword')}
+        style={styles.forgotLink}
+      >
         <Text style={styles.forgotText}>Forgot password?</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
@@ -115,5 +121,6 @@ const styles = StyleSheet.create({
   forgotText: {
     color: '#555',
     fontSize: 13,
+    textDecorationLine: 'underline',
   },
 });

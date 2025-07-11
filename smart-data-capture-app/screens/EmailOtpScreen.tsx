@@ -2,14 +2,19 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 
-export default function EmailOtpScreen({ navigation }: any) {
+export default function EmailOtpScreen({ navigation, setAuth }: any) {
   const [email, setEmail] = useState('');
 
   const sendOtp = async () => {
     try {
       await axios.post('http://192.168.145.55:3000/send-otp', { email });
       Alert.alert('OTP sent to your email');
-      navigation.navigate('OtpVerification', { email }); // ✅ Pass email to next screen
+
+      // ✅ Pass setAuth from navigation to OTP screen
+      navigation.navigate('OtpVerification', {
+        email,
+        setAuth, // Pass down from App.tsx
+      });
     } catch (error: any) {
       Alert.alert('Error', error?.response?.data?.error || 'Failed to send OTP');
     }

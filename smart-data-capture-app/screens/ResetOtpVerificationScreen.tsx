@@ -2,25 +2,22 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import axios from 'axios';
 
-const SERVER_URL = 'http://192.168.145.55:3000';
-
-export default function OtpVerificationScreen({ route }: any) {
+export default function ResetOtpVerificationScreen({ navigation, route }: any) {
   const [otp, setOtp] = useState('');
-  const { email, phone, setAuth } = route.params;
+  const { email } = route.params;
 
-  const verifyOtp = async () => {
+  const verifyResetOtp = async () => {
     try {
-      const res = await axios.post(`${SERVER_URL}/verify-otp`, {
+      const res = await axios.post('http://192.168.145.55:3000/verify-otp', {
         email,
-        phone,
         otp,
       });
 
       if (res.data.verified) {
-        Alert.alert('Success', 'OTP Verified!');
-        if (typeof setAuth === 'function') setAuth(true); // ✅ triggers login
+        Alert.alert('Success', 'OTP verified. Reset your password.');
+        navigation.navigate('NewPassword', { email }); // ✅ Navigate to reset screen
       } else {
-        Alert.alert('Invalid OTP', res.data.message || '');
+        Alert.alert('Invalid OTP', res.data.message || 'Try again');
       }
     } catch (err) {
       console.error(err);
@@ -37,18 +34,18 @@ export default function OtpVerificationScreen({ route }: any) {
         keyboardType="numeric"
         style={styles.input}
       />
-      <Button title="Verify OTP" onPress={verifyOtp} />
+      <Button title="Verify OTP" onPress={verifyResetOtp} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
+  container: { flex: 1, padding: 20, justifyContent: 'center' },
   input: {
     borderWidth: 1,
     padding: 12,
-    fontSize: 16,
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 10,
+    fontSize: 16,
   },
 });
