@@ -1,38 +1,35 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import axios from 'axios';
 
-export default function OtpVerificationScreen({ navigation, route, setAuth }: any) {
+export default function OtpVerifyScreen({ navigation, route, setAuth }: any) {
   const [otp, setOtp] = useState('');
-  const { email } = route.params; // ✅ Received from EmailOtpScreen
+  const email = route.params?.email;
 
   const verifyOtp = async () => {
     try {
-      const response = await axios.post('http://192.168.145.55:3000/verify-otp', {
-        email,
-        otp: otp.trim(),
-      });
+      const res = await axios.post('http://192.168.145.55:3000/verify-otp', { email, otp });
 
-      if (response.data.verified) {
-        Alert.alert('✅ OTP Verified');
-        setAuth(true); // ✅ Set login true
+      if (res.data.verified) {
+        Alert.alert('Success', 'OTP Verified!');
+        setAuth(true); // ✅ This will trigger login to home
       } else {
-        Alert.alert('❌ Invalid OTP');
+        Alert.alert('Failed', 'Invalid OTP');
       }
     } catch (err) {
-      Alert.alert('Error', 'Verification failed');
+      console.error(err);
+      Alert.alert('Error', 'Server error');
     }
   };
 
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.input}
         placeholder="Enter OTP"
-        keyboardType="number-pad"
-        onChangeText={setOtp}
         value={otp}
-        maxLength={6}
+        onChangeText={setOtp}
+        style={styles.input}
+        keyboardType="numeric"
       />
       <Button title="Verify OTP" onPress={verifyOtp} />
     </View>
@@ -40,6 +37,12 @@ export default function OtpVerificationScreen({ navigation, route, setAuth }: an
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: 'center' },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
+  container: { flex: 1, justifyContent: 'center', padding: 20 },
+  input: {
+    borderWidth: 1,
+    padding: 12,
+    fontSize: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
 });

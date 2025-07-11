@@ -2,6 +2,8 @@
   "expo": {
     "name": "smart-data-capture",
     "slug": "smart-data-capture",
+    "owner": "soumya_mantha",
+    "scheme": "com.soumyamantha.smartdatacapture",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,17 +15,31 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.soumyamantha.smartdatacapture"
     },
     "android": {
+      "package": "com.soumyamantha.smartdatacapture",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "config": {
+        "googleSignIn": {
+          "certificateHash": "24:2F:1A:2E:49:54:82:84:FB:D7:55:28:82:30:C4:21:29:74:6B:CC"
+        }
+      }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "config": {
+        "firebase": {
+          "authDomain": "YOUR_PROJECT.firebaseapp.com",
+          "apiKey": "YOUR_FIREBASE_API_KEY",
+          "projectId": "YOUR_PROJECT_ID"
+        }
+      }
     }
   }
 }

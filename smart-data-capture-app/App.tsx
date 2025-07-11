@@ -11,9 +11,12 @@ import FAQScreen from './screens/FAQScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import InviteScreen from './screens/InviteScreen';
 import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignUpScreen';
 import PhoneOtpScreen from './screens/PhoneOtpScreen';
 import EmailOtpScreen from './screens/EmailOtpScreen';
 import OtpVerificationScreen from './screens/OtpVerificationScreen';
+import OtpChoiceScreen from './screens/OtpChoiceScreen';
+
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -44,19 +47,21 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
-          <Stack.Screen name="MainDrawer" component={DrawerScreens} />
-        ) : (
+        {!isAuthenticated ? (
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Login">
+              {(props) => <LoginScreen {...props} setAuth={setIsAuthenticated} />}
+            </Stack.Screen>
+            <Stack.Screen name="Signup" component={SignupScreen} />
+            <Stack.Screen name="OtpChoice" component={OtpChoiceScreen} />
             <Stack.Screen name="PhoneOtp" component={PhoneOtpScreen} />
             <Stack.Screen name="EmailOtp" component={EmailOtpScreen} />
             <Stack.Screen name="OtpVerification">
-              {(props) => (
-                <OtpVerificationScreen {...props} setAuth={setIsAuthenticated} />
-              )}
+              {(props) => <OtpVerificationScreen {...props} setAuth={setIsAuthenticated} />}
             </Stack.Screen>
           </>
+        ) : (
+          <Stack.Screen name="Drawer" component={DrawerScreens} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

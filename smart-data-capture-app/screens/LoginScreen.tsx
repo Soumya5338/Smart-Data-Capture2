@@ -1,51 +1,119 @@
-import React, { useEffect } from 'react';
-import { View, Button, StyleSheet, Alert, Platform } from 'react-native';
-import * as Google from 'expo-auth-session/providers/google';
-import { signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 
-export default function LoginScreen({ navigation }: any) {
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: Platform.select({
-      android: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com',
-      ios: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com',
-      web: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
-    }),
-  });
+export default function LoginScreen({ navigation, setAuth }: any) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(auth, credential)
-        .then(() => navigation.replace('Home'))
-        .catch((e) => Alert.alert('Error', e instanceof Error ? e.message : 'Unknown error'));
+  const handleLogin = () => {
+    // Dummy login: Replace this with real API call
+    if (username && password) {
+      setAuth(true); // triggers Drawer navigation
+    } else {
+      alert("Please enter username and password");
     }
-  }, [response]);
+  };
 
   return (
-    <View style={styles.container}>
-      <Button title="📱 Login with Phone OTP" onPress={() => navigation.navigate('PhoneOtp')} />
-      <Button title="📧 Login with Email OTP" onPress={() => navigation.navigate('EmailOtp')} />
-      <Button
-        title="🔐 Sign in with Google"
-        onPress={() => {
-          if (request) {
-            promptAsync();
-          } else {
-            Alert.alert('Error', 'Google Login is not ready yet');
-          }
-        }}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <Text style={styles.logo}>Smart Capture</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Username or Email"
+        placeholderTextColor="#888"
+        value={username}
+        onChangeText={setUsername}
       />
-    </View>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#888"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
+
+      <TouchableOpacity onPress={handleLogin} style={styles.loginBtn}>
+        <Text style={styles.loginText}>Log In</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Signup')}
+        style={styles.signupLink}
+      >
+        <Text style={styles.signupText}>
+          Don't have an account? <Text style={{ fontWeight: 'bold' }}>Sign up</Text>
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.forgotLink}>
+        <Text style={styles.forgotText}>Forgot password?</Text>
+      </TouchableOpacity>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 30,
     justifyContent: 'center',
-    gap: 20,
-    padding: 20,
+    backgroundColor: '#fff',
+  },
+  logo: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 40,
+    color: '#EF156F',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 15,
+  },
+  loginBtn: {
+    backgroundColor: '#EF156F',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  loginText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  signupLink: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  signupText: {
+    color: '#555',
+  },
+  forgotLink: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  forgotText: {
+    color: '#555',
+    fontSize: 13,
   },
 });
